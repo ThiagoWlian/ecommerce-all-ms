@@ -1,10 +1,7 @@
 package com.thiagowlian.MSPRODUTO.configuration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,6 +21,23 @@ public class RabbitMqConfiguration {
     public Queue queueProdutoReduzirEstoque() {
         log.info("Gerando fila: " + PRODUTO_REDUZIR_ESTOQUE_QUEUE);
         return new Queue(PRODUTO_REDUZIR_ESTOQUE_QUEUE);
+    }
+
+    @Bean
+    public FanoutExchange exchangeProducoCriado() {
+        return new FanoutExchange(PRODUDO_NOVO_EXCHANGE);
+    }
+
+    @Bean
+    public Queue queueNovoProdutoQueryTable() {
+        return new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE);
+    }
+
+    @Bean
+    public Binding bindingProdutoCreated() {
+        return BindingBuilder
+                .bind(new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE))
+                .to(new FanoutExchange(PRODUDO_NOVO_EXCHANGE));
     }
 
     @Bean

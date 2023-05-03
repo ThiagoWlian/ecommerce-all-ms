@@ -1,13 +1,7 @@
 version: "3.8"
 services:
-  api-gateway:
-    image: nginx
-    container_name: nginx-api-gateway
-    ports:
-      - "80:80"
-
   mensageria-rabbitmq:
     image: rabbitmq:3.11
     container_name: mensageria-rabbitmq
     ports:
-      - "15672:15672"
+      - "15673:15672"

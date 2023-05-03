@@ -24,10 +24,10 @@ public class EstoqueListener {
     private VendaFeedbackProducer producerVendaFeedback;
 
     @RabbitListener(queues = PRODUTO_REDUZIR_ESTOQUE_QUEUE)
-    public void onReduzirEstoqueCreated(ReducaoEstoqueDto reducaoEstoqueDto) {
+    public void onVendaCreated(ReducaoEstoqueDto reducaoEstoqueDto) {
         try {
-            List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaId(reducaoEstoqueDto.produtosId());
-            if (!reducaoEstoqueDto.produtosId().isEmpty() && produtos.isEmpty()) {
+            List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaId(reducaoEstoqueDto.produtosCodigoBarra());
+            if (!reducaoEstoqueDto.produtosCodigoBarra().isEmpty() && produtos.isEmpty()) {
                 producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueDto.vendaId(), true));
             }
             produtoService.reduzirEstoqueProduto(produtos);

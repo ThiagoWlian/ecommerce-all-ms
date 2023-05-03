@@ -1,19 +1,49 @@
 package com.thiagowlian.MSPRODUTO.repository;
 
-import com.thiagowlian.MSPRODUTO.dto.ProdutoDto;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@Repository
-public interface ProdutoRepository extends JpaRepository<ProdutoModel, Long> {
+@Component
+public class ProdutoRepository {
 
-    @Query("select new com.thiagowlian.MSPRODUTO.dto.ProdutoDto(p) from ProdutoModel p where p.id = :id")
-    public ProdutoDto findProdutoDtoById(long id);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    @Query("select new com.thiagowlian.MSPRODUTO.dto.ProdutoDto(p) from ProdutoModel p")
-    public List<ProdutoDto> findProdutoDtoAll();
+    @Autowired
+    @Qualifier("simpleJdbcInsertProduto")
+    SimpleJdbcInsert simpleJdbcInsert;
+
+    public void insert(ProdutoModel produtoModel) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("codigo_barra", produtoModel.getCodigoBarras());
+        parameters.put("nome", produtoModel.getNome());
+        parameters.put("valor", produtoModel.getValor());
+        parameters.put("estoque", produtoModel.getEstoque());
+        parameters.put("tipo", produtoModel.getProdutoTipo().toString());
+        simpleJdbcInsert.execute(parameters);
+    }
+
+    public List<ProdutoModel> findAll(){
+        return jdbcTemplate.query("SELECT * FROM produto", new BeanPropertyRowMapper(ProdutoModel.class));
+    }
+
+    public List<ProdutoModel> findAllByCodigosBarra(List<String> codigosBarra){
+        return jdbcTemplate.query("SELECT * FROM produto where codigoBarra in (?)", new BeanPropertyRowMapper(ProdutoModel.class), codigosBarra);
+    }
+
+    public Optional<ProdutoModel> findByCodigoBarra(String codigoBarra){
+        ProdutoModel produtoModel = (ProdutoModel) jdbcTemplate.queryForObject("SELECT * FROM produto where codigoBarra = ?", new BeanPropertyRowMapper(ProdutoModel.class), codigoBarra);
+        return Optional.of(produtoModel);
+    }
 }

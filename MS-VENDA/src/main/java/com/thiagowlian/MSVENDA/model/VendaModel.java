@@ -13,11 +13,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Table(name = "venda")
-public class VendaModel {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class VendaModel extends BaseModel{
 
     @Setter
     @ElementCollection

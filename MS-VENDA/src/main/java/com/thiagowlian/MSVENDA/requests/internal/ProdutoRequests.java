@@ -1,8 +1,8 @@
-package com.thiagowlian.MSVENDA.consumer.api.internal;
+package com.thiagowlian.MSVENDA.requests.internal;
 
 import com.thiagowlian.MSVENDA.dto.ReducaoEstoqueDto;
-import com.thiagowlian.MSVENDA.dto.ResponseMessageTo;
-import com.thiagowlian.MSVENDA.messageProducer.ProdutoMessageProducer;
+import com.thiagowlian.MSVENDA.dto.ResponseMessageDto;
+import com.thiagowlian.MSVENDA.messageBroker.producer.VendaMessageProducer;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +14,10 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import java.util.List;
 
 @Component
-public class ProdutoConsumerApi {
+public class ProdutoRequests {
 
     @Autowired
-    private ProdutoMessageProducer produtoMessageProducer;
+    private VendaMessageProducer vendaMessageProducer;
 
     @CircuitBreaker(name = "estoqueReducao", fallbackMethod = "fallback")
     public ResponseEntity consumerEstoqueProduto(List<ReducaoEstoqueDto> ids) {
@@ -33,6 +33,6 @@ public class ProdutoConsumerApi {
     }
 
     public ResponseEntity fallback(WebClientRequestException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessageTo("O sistema de produtos está offline! Tente novamente mais tarde."));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessageDto("O sistema de produtos está offline! Tente novamente mais tarde."));
     }
 }

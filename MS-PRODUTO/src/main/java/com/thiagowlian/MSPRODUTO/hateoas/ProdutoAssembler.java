@@ -1,4 +1,4 @@
-package com.thiagowlian.MSPRODUTO.hateoas.assembler;
+package com.thiagowlian.MSPRODUTO.hateoas;
 
 import com.thiagowlian.MSPRODUTO.controller.ProdutoController;
 import com.thiagowlian.MSPRODUTO.dto.ProdutoDto;
@@ -20,8 +20,8 @@ public class ProdutoAssembler extends RepresentationModelAssemblerSupport<Produt
     @Override
     public ProdutoDto toModel(ProdutoModel entity) {
         ProdutoDto produtoDto = new ProdutoDto(entity);
-        produtoDto.add(linkTo(methodOn(ProdutoController.class).buscarProdutoEspecifico(entity.getId())).withSelfRel());
-        produtoDto.add(linkTo(methodOn(ProdutoController.class).deletarProdutoPorId(entity.getId())).withRel("delete"));
+        produtoDto.add(linkTo(methodOn(ProdutoController.class).buscarProdutoEspecifico(entity.getCodigoBarras())).withSelfRel());
+        produtoDto.add(linkTo(methodOn(ProdutoController.class).deletarProdutoPorId(entity.getCodigoBarras())).withRel("delete"));
         return produtoDto;
     }
 

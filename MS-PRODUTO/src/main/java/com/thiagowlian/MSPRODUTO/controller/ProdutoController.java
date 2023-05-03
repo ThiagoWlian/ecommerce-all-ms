@@ -3,8 +3,10 @@ package com.thiagowlian.MSPRODUTO.controller;
 import com.thiagowlian.MSPRODUTO.dto.ProdutoDto;
 import com.thiagowlian.MSPRODUTO.dto.ProdutoForm;
 import com.thiagowlian.MSPRODUTO.dto.ReduzirEstoqueForm;
-import com.thiagowlian.MSPRODUTO.hateoas.assembler.ProdutoAssembler;
+import com.thiagowlian.MSPRODUTO.hateoas.ProdutoAssembler;
+import com.thiagowlian.MSPRODUTO.messageBroker.producer.ProdutoProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
+import com.thiagowlian.MSPRODUTO.service.EventProdutoService;
 import com.thiagowlian.MSPRODUTO.service.ProdutoService;
 import com.thiagowlian.MSPRODUTO.to.ResponseMessageTo;
 import jakarta.validation.Valid;
@@ -26,16 +28,23 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @Autowired
+    private EventProdutoService eventProdutoService;
+
+    @Autowired
+    private ProdutoProducer produtoProducer;
+
+    @Autowired
     private ProdutoAssembler produtoAssembler;
 
     @PostMapping
     public ResponseEntity criarNovoProduto(@RequestBody @Valid ProdutoForm produtoForm) {
         try {
             ProdutoModel produto = new ProdutoModel(produtoForm);
-            ProdutoModel produtoPersistido = produtoService.cadastrarProduto(produto);
-            ProdutoDto produtoDto = produtoAssembler.toModel(produtoPersistido);
+            eventProdutoService.cadastrarProduto(produto);
+            produtoProducer.publishProdutoCreatedEvent(produto);
+            ProdutoDto produtoDto = produtoAssembler.toModel(produto);
 
-            return ResponseEntity.created(URI.create(String.format("/produto/%s", produtoDto.getId()))).body(produtoDto);
+            return ResponseEntity.created(URI.create(String.format("/produto/%s", produtoDto.getCodigoBarras()))).body(produtoDto);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessageTo(ex.getMessage()));
         } catch (Exception ex) {
@@ -44,10 +53,10 @@ public class ProdutoController {
     }
 
     @PatchMapping("/reduzirEstoque")
-    public ResponseEntity reduzirEstoqueGrupo(@RequestBody @Valid List<ReduzirEstoqueForm> ids) {
+    public ResponseEntity reduzirEstoqueGrupo(@RequestBody @Valid List<ReduzirEstoqueForm> codigosBarra) {
         try {
-            List<ProdutoModel> produtoModel = produtoService.buscarProdutoPorListaId(ids.stream()
-                    .map(ReduzirEstoqueForm::id)
+            List<ProdutoModel> produtoModel = produtoService.buscarProdutoPorListaId(codigosBarra.stream()
+                    .map(ReduzirEstoqueForm::codigosBarra)
                     .collect(Collectors.toList()));
 
             if (!produtoModel.isEmpty()) {
@@ -71,10 +80,10 @@ public class ProdutoController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity buscarProdutoEspecifico(@PathVariable long id) {
+    @GetMapping("/{codigoBarra}")
+    public ResponseEntity buscarProdutoEspecifico(@PathVariable String codigoBarra) {
         try {
-            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(id);
+            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(codigoBarra);
             if (produto.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
@@ -84,10 +93,10 @@ public class ProdutoController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deletarProdutoPorId(@PathVariable long id){
+    @DeleteMapping("/{codigoBarra}")
+    public ResponseEntity deletarProdutoPorId(@PathVariable String codigoBarra){
         try {
-            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(id);
+            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(codigoBarra);
             if (produto.isPresent()) {
                 produtoService.deletarproduto(produto.get());
                 return ResponseEntity.ok().build();

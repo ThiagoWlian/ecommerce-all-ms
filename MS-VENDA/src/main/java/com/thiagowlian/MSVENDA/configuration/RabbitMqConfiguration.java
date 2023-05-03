@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.thiagowlian.MSVENDA.messageProducer.FilasMensageria.*;
+import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.*;
 
 @Slf4j
 @Configuration
@@ -19,21 +19,21 @@ public class RabbitMqConfiguration {
 
     @Bean
     public Queue queueFeedbackVendaChoreography() {
-        log.info("Gerando fila: " + VENDAS_FEEDBACK_CHOREOGRAPHY_QUEUE);
-        return new Queue(VENDAS_FEEDBACK_CHOREOGRAPHY_QUEUE);
+        log.info("Gerando fila: " + VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE);
+        return new Queue(VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE);
     }
 
     @Bean
     public DirectExchange directExchangeRealizarVendaChoreography() {
-        log.info("Gerando Exchange: " + VENDAS_REALIZAR_VENDA_CHOREOGRAPHY_EXCHANGE);
-        return new DirectExchange(VENDAS_REALIZAR_VENDA_CHOREOGRAPHY_EXCHANGE);
+        log.info("Gerando Exchange: " + VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE);
+        return new DirectExchange(VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE);
     }
 
     @Bean
     public Binding bindingVendaFeedback() {
         return BindingBuilder
-                .bind(new Queue(VENDAS_FEEDBACK_CHOREOGRAPHY_QUEUE))
-                .to(new DirectExchange(VENDAS_REALIZAR_VENDA_CHOREOGRAPHY_EXCHANGE))
+                .bind(new Queue(VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE))
+                .to(new DirectExchange(VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE))
                 .with(VENDA_FEEDBACK_CHOREOGRAPHY_ROUTING_KEY);
     }
 
