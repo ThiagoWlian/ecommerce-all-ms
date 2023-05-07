@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.PRODUTO_NOVO_QUERY_TABLE_QUEUE;
+import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.PRODUTO_UPDATE_QUERY_TABLE_QUEUE;
 
 @Component
 public class ProdutoListener {
@@ -16,6 +17,11 @@ public class ProdutoListener {
     private ProdutoService produtoService;
 
     @RabbitListener(queues = PRODUTO_NOVO_QUERY_TABLE_QUEUE)
+    public void onCreatedProduto(ProdutoModel produto) {
+        produtoService.cadastrarProduto(produto);
+    }
+
+    @RabbitListener(queues = PRODUTO_UPDATE_QUERY_TABLE_QUEUE)
     public void onCreatedProduto(ProdutoModel produto) {
         produtoService.cadastrarProduto(produto);
     }

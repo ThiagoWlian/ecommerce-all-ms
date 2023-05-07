@@ -1,6 +1,6 @@
 package com.thiagowlian.MSPRODUTO.messageBroker.listener;
 
-import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueDto;
+import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueWithListProductsDto;
 import com.thiagowlian.MSPRODUTO.dto.VendaFeedbackDto;
 import com.thiagowlian.MSPRODUTO.messageBroker.producer.VendaFeedbackProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
@@ -24,15 +24,15 @@ public class EstoqueListener {
     private VendaFeedbackProducer producerVendaFeedback;
 
     @RabbitListener(queues = PRODUTO_REDUZIR_ESTOQUE_QUEUE)
-    public void onVendaCreated(ReducaoEstoqueDto reducaoEstoqueDto) {
+    public void onVendaCreated(ReducaoEstoqueWithListProductsDto reducaoEstoqueWithListProductsDto) {
         try {
-            List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaId(reducaoEstoqueDto.produtosCodigoBarra());
-            if (!reducaoEstoqueDto.produtosCodigoBarra().isEmpty() && produtos.isEmpty()) {
-                producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueDto.vendaId(), true));
+            List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaCodigoBarra(reducaoEstoqueWithListProductsDto.produtosCodigoBarra());
+            if (!reducaoEstoqueWithListProductsDto.produtosCodigoBarra().isEmpty() && produtos.isEmpty()) {
+                producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId(), true));
             }
-            produtoService.reduzirEstoqueProduto(produtos);
+            produtoService.reduzirEstoqueProdutoEmUm(produtos);
         } catch (Exception ex) {
-            producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueDto.vendaId(), true));
+            producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId(), true));
         }
     }
 }

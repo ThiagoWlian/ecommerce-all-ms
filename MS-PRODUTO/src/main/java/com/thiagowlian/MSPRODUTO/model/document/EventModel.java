@@ -19,9 +19,9 @@ public class EventModel {
     private String id;
     private LocalDateTime eventDate = LocalDateTime.now();
     private EventType eventType;
-    private BaseModel content;
+    private Object content;
 
-    public EventModel(EventType eventType, BaseModel content) {
+    public EventModel(EventType eventType, Object content) {
         this.eventType = eventType;
         this.content = content;
     }

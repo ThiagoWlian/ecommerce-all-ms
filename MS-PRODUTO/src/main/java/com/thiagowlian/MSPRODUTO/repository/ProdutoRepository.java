@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +35,20 @@ public class ProdutoRepository {
     }
 
     public List<ProdutoModel> findAll(){
-        return jdbcTemplate.query("SELECT * FROM produto", new BeanPropertyRowMapper(ProdutoModel.class));
+        return jdbcTemplate.query("SELECT * FROM PRODUTO", new BeanPropertyRowMapper(ProdutoModel.class));
     }
 
     public List<ProdutoModel> findAllByCodigosBarra(List<String> codigosBarra){
-        return jdbcTemplate.query("SELECT * FROM produto where codigoBarra in (?)", new BeanPropertyRowMapper(ProdutoModel.class), codigosBarra);
+        return jdbcTemplate.query("SELECT * FROM PRODUTO WHERE codigo_barra IN (?)", (rs, rowNum) -> {
+                    ProdutoModel produtoModel = new ProdutoModel();
+                    produtoModel.setCodigoBarras(rs.getString("codigo_barra"));
+                    return produtoModel;
+                },
+                codigosBarra.toArray());
     }
 
     public Optional<ProdutoModel> findByCodigoBarra(String codigoBarra){
-        ProdutoModel produtoModel = (ProdutoModel) jdbcTemplate.queryForObject("SELECT * FROM produto where codigoBarra = ?", new BeanPropertyRowMapper(ProdutoModel.class), codigoBarra);
+        ProdutoModel produtoModel = (ProdutoModel) jdbcTemplate.queryForObject("SELECT * FROM PRODUTO where codigoBarra = ?", new BeanPropertyRowMapper(ProdutoModel.class), codigoBarra);
         return Optional.of(produtoModel);
     }
 }

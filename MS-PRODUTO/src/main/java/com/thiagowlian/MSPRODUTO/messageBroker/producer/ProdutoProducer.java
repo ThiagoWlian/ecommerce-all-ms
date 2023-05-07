@@ -6,8 +6,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.NULL_ROUNTING_KEY;
-import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.PRODUDO_NOVO_EXCHANGE;
+import java.util.List;
+
+import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.*;
 
 @Slf4j
 @Component
@@ -17,6 +18,18 @@ public class ProdutoProducer {
     private RabbitTemplate rabbitTemplate;
 
     public void publishProdutoCreatedEvent(ProdutoModel produto) {
+        rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, produto);
+    }
+
+    public void publishProdutosUpdateEvent(List<ProdutoModel> produtos) {
+        produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, e));
+    }
+
+    public void publishProdutosReducaoEstoqueEvent(List<ProdutoModel> produtos) {
+        produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_UPDATE_EXCHANGE, NULL_ROUNTING_KEY, e));
+    }
+
+    public void publishProdutoReducaoEstoqueEvent(ProdutoModel produto) {
         rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, produto);
     }
 }

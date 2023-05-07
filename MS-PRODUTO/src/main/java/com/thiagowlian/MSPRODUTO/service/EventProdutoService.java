@@ -1,5 +1,6 @@
 package com.thiagowlian.MSPRODUTO.service;
 
+import com.thiagowlian.MSPRODUTO.messageBroker.producer.ProdutoProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import com.thiagowlian.MSPRODUTO.model.document.EventModel;
 import com.thiagowlian.MSPRODUTO.model.document.EventType;
@@ -14,7 +15,12 @@ public class EventProdutoService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private ProdutoProducer produtoProducer;
+
     public EventModel cadastrarProduto(ProdutoModel produto) {
-        return eventRepository.insert(new EventModel(EventType.NOVO_PRODUTO, produto));
+        EventModel event = eventRepository.insert(new EventModel(EventType.NOVO_PRODUTO, produto));
+        produtoProducer.publishProdutoCreatedEvent(produto);
+        return event;
     }
 }

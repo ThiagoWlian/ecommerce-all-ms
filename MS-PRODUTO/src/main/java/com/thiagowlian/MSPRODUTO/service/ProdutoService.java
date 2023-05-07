@@ -1,6 +1,7 @@
 package com.thiagowlian.MSPRODUTO.service;
 
-import com.thiagowlian.MSPRODUTO.model.BaseModel;
+import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueDto;
+import com.thiagowlian.MSPRODUTO.messageBroker.producer.ProdutoProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import com.thiagowlian.MSPRODUTO.model.document.EventModel;
 import com.thiagowlian.MSPRODUTO.model.document.EventType;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,22 +25,37 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Autowired
+    private ProdutoProducer produtoProducer;
+
     public List<ProdutoModel> buscarTodosProdutos() {
         return produtoRepository.findAll();
     }
 
-    public Optional<ProdutoModel> buscarProdutoPorId(String codigosBarra) {
+    public Optional<ProdutoModel> buscarProdutoPorCodigoBarra(String codigosBarra) {
         return produtoRepository.findByCodigoBarra(codigosBarra);
     }
 
-    public List<ProdutoModel> buscarProdutoPorListaId(List<String> codigosBarra) {
+    public List<ProdutoModel> buscarProdutoPorListaCodigoBarra(List<String> codigosBarra) {
         return produtoRepository.findAllByCodigosBarra(codigosBarra);
     }
 
-    public void reduzirEstoqueProduto(List<ProdutoModel> produtoModels) {
-        produtoModels.forEach(ProdutoModel::reduzirEstoqueEmUm);
-        List<EventModel> eventModels = produtoModels.stream().map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, e)).toList();
-        eventRepository.insert(eventModels);
+    public void reduzirEstoqueProdutoEmUm(List<ProdutoModel> produtoModels) {
+        List<EventModel> eventModels = produtoModels.stream()
+                .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new ReducaoEstoqueDto(e.getCodigoBarras(), 1)))
+                .toList();
+        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
+        this.atualizarProdutos(eventModels);
+    }
+
+    @Transient
+    public void atualizarProdutos(List<EventModel> eventModels){
+        try {
+            eventRepository.insert(eventModels);
+            produtoProducer.publishProdutosUpdateEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
     public void deletarproduto(ProdutoModel produto) {

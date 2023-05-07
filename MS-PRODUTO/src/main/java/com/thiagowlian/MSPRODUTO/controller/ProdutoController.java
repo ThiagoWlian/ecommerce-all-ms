@@ -41,7 +41,6 @@ public class ProdutoController {
         try {
             ProdutoModel produto = new ProdutoModel(produtoForm);
             eventProdutoService.cadastrarProduto(produto);
-            produtoProducer.publishProdutoCreatedEvent(produto);
             ProdutoDto produtoDto = produtoAssembler.toModel(produto);
 
             return ResponseEntity.created(URI.create(String.format("/produto/%s", produtoDto.getCodigoBarras()))).body(produtoDto);
@@ -55,13 +54,17 @@ public class ProdutoController {
     @PatchMapping("/reduzirEstoque")
     public ResponseEntity reduzirEstoqueGrupo(@RequestBody @Valid List<ReduzirEstoqueForm> codigosBarra) {
         try {
-            List<ProdutoModel> produtoModel = produtoService.buscarProdutoPorListaId(codigosBarra.stream()
+            List<ProdutoModel> produtosList = produtoService.buscarProdutoPorListaCodigoBarra(codigosBarra.stream()
                     .map(ReduzirEstoqueForm::codigosBarra)
                     .collect(Collectors.toList()));
 
-            if (!produtoModel.isEmpty()) {
-                produtoService.reduzirEstoqueProduto(produtoModel);
+            if (!produtosList.isEmpty()) {
+                produtoService.reduzirEstoqueProdutoEmUm(produtosList);
                 return ResponseEntity.ok().build();
+            }
+
+            if (produtosList.size() != codigosBarra.size()) {
+                return ResponseEntity.internalServerError().body(new ResponseMessageTo("Código de barras inexistente!"));
             }
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
@@ -83,7 +86,7 @@ public class ProdutoController {
     @GetMapping("/{codigoBarra}")
     public ResponseEntity buscarProdutoEspecifico(@PathVariable String codigoBarra) {
         try {
-            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(codigoBarra);
+            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorCodigoBarra(codigoBarra);
             if (produto.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
@@ -96,7 +99,7 @@ public class ProdutoController {
     @DeleteMapping("/{codigoBarra}")
     public ResponseEntity deletarProdutoPorId(@PathVariable String codigoBarra){
         try {
-            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorId(codigoBarra);
+            Optional<ProdutoModel> produto = produtoService.buscarProdutoPorCodigoBarra(codigoBarra);
             if (produto.isPresent()) {
                 produtoService.deletarproduto(produto.get());
                 return ResponseEntity.ok().build();
