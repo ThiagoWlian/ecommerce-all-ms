@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.PRODUTO_REDUZIR_ESTOQUE_QUEUE;
+import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.VENDA_REALIZADA_PRODUTO_REDUZIR_ESTOQUE_QUEUE;
 
 @Slf4j
 @Component
@@ -23,7 +23,7 @@ public class EstoqueListener {
     @Autowired
     private VendaFeedbackProducer producerVendaFeedback;
 
-    @RabbitListener(queues = PRODUTO_REDUZIR_ESTOQUE_QUEUE)
+    @RabbitListener(queues = VENDA_REALIZADA_PRODUTO_REDUZIR_ESTOQUE_QUEUE)
     public void onVendaCreated(ReducaoEstoqueWithListProductsDto reducaoEstoqueWithListProductsDto) {
         try {
             List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaCodigoBarra(reducaoEstoqueWithListProductsDto.produtosCodigoBarra());

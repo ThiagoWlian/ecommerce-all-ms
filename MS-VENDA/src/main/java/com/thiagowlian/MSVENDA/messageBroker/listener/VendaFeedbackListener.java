@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE;
+import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.VENDA_FEEDBACK_QUEUE;
 
 @Component
 public class VendaFeedbackListener {
@@ -15,7 +15,7 @@ public class VendaFeedbackListener {
     @Autowired
     private VendaService vendaService;
 
-    @RabbitListener(queues = VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE)
+    @RabbitListener(queues = VENDA_FEEDBACK_QUEUE)
     public void onVendaFeedbackCreated(VendaFeedbackDto vendaFeedbackDto) {
         StatusVenda statusVenda = vendaFeedbackDto.revert() ? StatusVenda.ERRO : StatusVenda.CONCLUIDA;
         vendaService.atualizarStatusVenda(vendaFeedbackDto.vendaId(), statusVenda);

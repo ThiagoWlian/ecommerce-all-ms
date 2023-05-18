@@ -16,7 +16,7 @@ public class VendaMessageProducer {
     private RabbitTemplate rabbitTemplate;
 
     public void producerVendaRealizada(ReducaoEstoqueDto idsReducaoEstoque) {
-        rabbitTemplate.convertAndSend(VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE, VENDA_REALIZADA_ROUTING_KEY, idsReducaoEstoque);
+        rabbitTemplate.convertAndSend(VENDA_REALIZADA_EXCHANGE, VENDA_REALIZADA_ROUTING_KEY, idsReducaoEstoque);
     }
 }
 

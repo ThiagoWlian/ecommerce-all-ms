@@ -1,7 +1,10 @@
-package com.thiagowlian.MSPRODUTO.configuration;
+package com.thiagowlian.MSNOTAFISCAL.configuration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,41 +14,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.*;
+import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.*;
 
 @Slf4j
 @Configuration
 public class RabbitMqConfiguration {
-
-    @Bean
-    public FanoutExchange exchangeProducoCriado() {
-        return new FanoutExchange(PRODUDO_NOVO_EXCHANGE);
-    }
-
-    @Bean
-    public Queue queueNovoProdutoQueryTable() {
-        return new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE);
-    }
-
-    @Bean
-    public Queue queueUpdateProdutoQueryTable() {
-        return new Queue(PRODUDO_UPDATE_EXCHANGE);
-    }
-
-    @Bean
-    public Binding bindingProdutoCreated() {
-        return BindingBuilder
-                .bind(new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE))
-                .to(new FanoutExchange(PRODUDO_NOVO_EXCHANGE));
-    }
-
-    @Bean
-    public Binding bindingProdutoUpdated() {
-        return BindingBuilder
-                .bind(new Queue(PRODUTO_UPDATE_QUERY_TABLE_QUEUE))
-                .to(new FanoutExchange(PRODUDO_UPDATE_EXCHANGE));
-    }
-
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);

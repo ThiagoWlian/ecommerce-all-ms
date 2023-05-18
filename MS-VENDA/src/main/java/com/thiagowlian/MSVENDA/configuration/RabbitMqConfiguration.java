@@ -18,23 +18,28 @@ import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.*;
 public class RabbitMqConfiguration {
 
     @Bean
-    public Queue queueFeedbackVendaChoreography() {
-        log.info("Gerando fila: " + VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE);
-        return new Queue(VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE);
+    public FanoutExchange fanoutExchangeVendaRealizada() {
+        log.info("Gerando exchange: " + VENDA_REALIZADA_EXCHANGE);
+        return new FanoutExchange(VENDA_REALIZADA_EXCHANGE);
     }
 
     @Bean
-    public DirectExchange directExchangeRealizarVendaChoreography() {
-        log.info("Gerando Exchange: " + VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE);
-        return new DirectExchange(VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE);
+    public FanoutExchange fanoutExchangeVendaFeedbck() {
+        log.info("Gerando exchange: " + VENDA_FEEDBACK_EXCHANGE);
+        return new FanoutExchange(VENDA_FEEDBACK_EXCHANGE);
+    }
+
+    @Bean
+    public Queue queueFeedbackVenda() {
+        log.info("Gerando fila: " + VENDA_FEEDBACK_QUEUE);
+        return new Queue(VENDA_FEEDBACK_QUEUE);
     }
 
     @Bean
     public Binding bindingVendaFeedback() {
         return BindingBuilder
-                .bind(new Queue(VENDA_FEEDBACK_CHOREOGRAPHY_QUEUE))
-                .to(new DirectExchange(VENDAS_REALIZADA_VENDA_CHOREOGRAPHY_EXCHANGE))
-                .with(VENDA_FEEDBACK_CHOREOGRAPHY_ROUTING_KEY);
+                .bind(new Queue(VENDA_FEEDBACK_QUEUE))
+                .to(new FanoutExchange(VENDA_REALIZADA_EXCHANGE));
     }
 
     @Bean
