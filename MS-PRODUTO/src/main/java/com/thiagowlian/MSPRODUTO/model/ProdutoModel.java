@@ -31,7 +31,8 @@ public class ProdutoModel extends BaseModel{
         estoque -= quantidadeReducao;
     }
 
-    public void reduzirEstoqueEmUm() {
+    public long reduzirEstoqueEmUm() {
         estoque -= 1;
+        return estoque;
     }
 }

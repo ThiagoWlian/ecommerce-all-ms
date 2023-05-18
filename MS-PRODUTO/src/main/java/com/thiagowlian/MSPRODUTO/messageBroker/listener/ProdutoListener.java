@@ -22,7 +22,7 @@ public class ProdutoListener {
     }
 
     @RabbitListener(queues = PRODUTO_UPDATE_QUERY_TABLE_QUEUE)
-    public void onCreatedProduto(ProdutoModel produto) {
+    public void onUpdatedProduto(ProdutoModel produto) {
         produtoService.cadastrarProduto(produto);
     }
 }

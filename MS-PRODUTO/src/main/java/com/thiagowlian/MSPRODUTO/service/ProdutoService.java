@@ -42,9 +42,9 @@ public class ProdutoService {
 
     public void reduzirEstoqueProdutoEmUm(List<ProdutoModel> produtoModels) {
         List<EventModel> eventModels = produtoModels.stream()
-                .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new ReducaoEstoqueDto(e.getCodigoBarras(), 1)))
+                .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new ReducaoEstoqueDto(e.getCodigoBarras(), e.reduzirEstoqueEmUm())))
                 .toList();
-        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
+        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (ReducaoEstoqueDto)e.getContent()).toList());
         this.atualizarProdutos(eventModels);
     }
 
@@ -52,7 +52,7 @@ public class ProdutoService {
     public void atualizarProdutos(List<EventModel> eventModels){
         try {
             eventRepository.insert(eventModels);
-            produtoProducer.publishProdutosUpdateEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
+            //produtoProducer.publishProdutosUpdateEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
         } catch (Exception e) {
             log.error(e.getMessage());
         }
