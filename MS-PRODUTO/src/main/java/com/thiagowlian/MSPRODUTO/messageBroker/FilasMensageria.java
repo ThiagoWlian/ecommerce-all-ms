@@ -4,6 +4,9 @@ public class FilasMensageria {
 
     public final static String VENDA_REALIZADA_PRODUTO_REDUZIR_ESTOQUE_QUEUE = "produtos.v1.venda-realizada.reduzir-estoque";
     public final static String VENDA_REALIZADA_EXCHANGE = "venda.v1.venda-realizada";
+    public final static String REALIZAR_VENDA_FEEDBACK_ERRO_TRANSACTION = "produtos.v1.realizar-venda.transaction.erro";
+    public final static String VENDA_FEEDBACK_EXCHANGE = "venda.v1.venda-feedback";
+    public final static String VENDA_FEEDBACK_ERRO_ROUTING_KEY = "venda.v1.venda-transaction.erro";
     public final static String VENDAS_REALIZAR_VENDA_CHOREOGRAPHY_EXCHANGE = "vendas.v1.realizar-vendas";
     public final static String VENDA_FEEDBACK_CHOREOGRAPHY_ROUTING_KEY = "feedback-realizar-venda";
     public final static String VENDA_REALIZADA_PRODUDO_REDUCAO_ESTOQUE_EXCHANGE = "produto.v1.venda-realizada.estoque-reduzido";

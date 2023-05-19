@@ -26,4 +26,12 @@ public class RabbitMQTransactionConfiguration {
                 .bind(new Queue(VENDA_REALIZADA_PRODUTO_REDUZIR_ESTOQUE_QUEUE))
                 .to(new FanoutExchange(VENDA_REALIZADA_EXCHANGE));
     }
+
+    @Bean
+    public Binding bindingVendaFeedback() {
+        return BindingBuilder
+                .bind(new Queue(REALIZAR_VENDA_FEEDBACK_ERRO_TRANSACTION))
+                .to(new DirectExchange(VENDA_FEEDBACK_EXCHANGE))
+                .with(VENDA_FEEDBACK_ERRO_ROUTING_KEY);
+    }
 }

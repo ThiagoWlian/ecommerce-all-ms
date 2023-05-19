@@ -16,32 +16,6 @@ import static com.thiagowlian.MSVENDA.messageBroker.FilasMensageria.*;
 @Slf4j
 @Configuration
 public class RabbitMqConfiguration {
-
-    @Bean
-    public FanoutExchange fanoutExchangeVendaRealizada() {
-        log.info("Gerando exchange: " + VENDA_REALIZADA_EXCHANGE);
-        return new FanoutExchange(VENDA_REALIZADA_EXCHANGE);
-    }
-
-    @Bean
-    public FanoutExchange fanoutExchangeVendaFeedbck() {
-        log.info("Gerando exchange: " + VENDA_FEEDBACK_EXCHANGE);
-        return new FanoutExchange(VENDA_FEEDBACK_EXCHANGE);
-    }
-
-    @Bean
-    public Queue queueFeedbackVenda() {
-        log.info("Gerando fila: " + VENDA_FEEDBACK_QUEUE);
-        return new Queue(VENDA_FEEDBACK_QUEUE);
-    }
-
-    @Bean
-    public Binding bindingVendaFeedback() {
-        return BindingBuilder
-                .bind(new Queue(VENDA_FEEDBACK_QUEUE))
-                .to(new FanoutExchange(VENDA_REALIZADA_EXCHANGE));
-    }
-
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
