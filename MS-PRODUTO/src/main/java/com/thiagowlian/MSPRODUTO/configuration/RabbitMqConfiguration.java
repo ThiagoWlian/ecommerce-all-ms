@@ -18,11 +18,6 @@ import static com.thiagowlian.MSPRODUTO.messageBroker.FilasMensageria.*;
 public class RabbitMqConfiguration {
 
     @Bean
-    public FanoutExchange exchangeProducoCriado() {
-        return new FanoutExchange(PRODUDO_NOVO_EXCHANGE);
-    }
-
-    @Bean
     public Queue queueNovoProdutoQueryTable() {
         return new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE);
     }
@@ -30,13 +25,6 @@ public class RabbitMqConfiguration {
     @Bean
     public Queue queueUpdateProdutoQueryTable() {
         return new Queue(PRODUDO_UPDATE_EXCHANGE);
-    }
-
-    @Bean
-    public Binding bindingProdutoCreated() {
-        return BindingBuilder
-                .bind(new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE))
-                .to(new FanoutExchange(PRODUDO_NOVO_EXCHANGE));
     }
 
     @Bean

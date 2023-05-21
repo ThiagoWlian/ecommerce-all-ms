@@ -17,14 +17,6 @@ public class RabbitMQTransactionConfiguration {
     }
 
     @Bean
-    public Binding bindingVendaFeedback() {
-        return BindingBuilder
-                .bind(new Queue(VENDA_FEEDBACK_QUEUE))
-                .to(new DirectExchange(VENDA_FEEDBACK_EXCHANGE))
-                .with(VENDA_FEEDBACK_ERRO_ROUTING_KEY);
-    }
-
-    @Bean
     public Binding bindingReducaoEstoque(){
         return BindingBuilder
                 .bind(new Queue(REALIZAR_VENDA_REDUCAO_ESTOQUE_TRANSACTION))

@@ -21,4 +21,8 @@ public class ProdutoProducer {
     public void publishProdutosReducaoEstoqueEvent(List<ReducaoEstoqueDto> produtos) {
         produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_UPDATE_EXCHANGE, NULL_ROUNTING_KEY, e));
     }
+
+    public void publishProdutoCreatedEvent(ProdutoModel produto) {
+        rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, produto);
+    }
 }
