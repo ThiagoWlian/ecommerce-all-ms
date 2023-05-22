@@ -35,4 +35,9 @@ public class ProdutoModel extends BaseModel{
         estoque -= 1;
         return estoque;
     }
+
+    public long aumentarEstoqueEmUm() {
+        estoque += 1;
+        return estoque;
+    }
 }

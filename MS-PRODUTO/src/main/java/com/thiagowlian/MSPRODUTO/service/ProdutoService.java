@@ -1,6 +1,6 @@
 package com.thiagowlian.MSPRODUTO.service;
 
-import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueDto;
+import com.thiagowlian.MSPRODUTO.dto.modificacaoEstoqueDto;
 import com.thiagowlian.MSPRODUTO.messageBroker.producer.ProdutoProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import com.thiagowlian.MSPRODUTO.model.document.EventModel;
@@ -42,17 +42,29 @@ public class ProdutoService {
 
     public void reduzirEstoqueProdutoEmUm(List<ProdutoModel> produtoModels) {
         List<EventModel> eventModels = produtoModels.stream()
-                .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new ReducaoEstoqueDto(e.getCodigoBarras(), e.reduzirEstoqueEmUm())))
+                .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new modificacaoEstoqueDto(e.getCodigoBarras(), e.reduzirEstoqueEmUm())))
                 .toList();
-        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (ReducaoEstoqueDto)e.getContent()).toList());
+        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (modificacaoEstoqueDto)e.getContent()).toList());
         this.atualizarProdutos(eventModels);
+    }
+
+    public void aumentarEstoqueProdutoEmUm(List<ProdutoModel> produtoModels) {
+        List<EventModel> eventModels = produtoModels.stream()
+                .map(e -> new EventModel(EventType.AUMENTAR_ESTOQUE, new modificacaoEstoqueDto(e.getCodigoBarras(), e.aumentarEstoqueEmUm())))
+                .toList();
+        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (modificacaoEstoqueDto)e.getContent()).toList());
+        this.atualizarProdutos(eventModels);
+    }
+
+    public void reverterReducaoEstoque(List<String> ids) {
+
     }
 
     @Transient
     public void atualizarProdutos(List<EventModel> eventModels){
         try {
             eventRepository.insert(eventModels);
-            //produtoProducer.publishProdutosUpdateEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
+            produtoProducer.publishProdutosUpdateEvent(eventModels.stream().map(e -> (ProdutoModel)e.getContent()).toList());
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -70,4 +82,7 @@ public class ProdutoService {
         }
     }
 
+    public boolean reducaoIsValid(List<String> codigosBarraReducao, List<ProdutoModel> produtoFind) {
+        return codigosBarraReducao.size() != produtoFind.size();
+    }
 }

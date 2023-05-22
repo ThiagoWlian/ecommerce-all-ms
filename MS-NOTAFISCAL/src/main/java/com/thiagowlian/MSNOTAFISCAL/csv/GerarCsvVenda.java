@@ -1,5 +1,7 @@
 package com.thiagowlian.MSNOTAFISCAL.csv;
 
+import com.thiagowlian.MSNOTAFISCAL.dto.ProdutoNfDto;
+import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -9,16 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import com.thiagowlian.MSNOTAFISCAL.dto.ProdutoDto;
+import org.springframework.stereotype.Component;
 
+@Component
+@NoArgsConstructor
 public class GerarCsvVenda {
 
     private String arquivoLocal;
     private final String TMP_PATH = "./tmp";
-
-    public GerarCsvVenda(String arquivoLocal) {
-        this.arquivoLocal = TMP_PATH + "/" + arquivoLocal;
-    }
 
     private CSVPrinter gerarCabecalho() {
         try {
@@ -31,10 +31,10 @@ public class GerarCsvVenda {
         }
     }
 
-    private CSVPrinter gerarConteudo(CSVPrinter csvPrinter ,Set<ProdutoDto> produtos) {
+    private CSVPrinter gerarConteudo(CSVPrinter csvPrinter ,Set<ProdutoNfDto> produtos) {
         produtos.forEach(e -> {
             try {
-                csvPrinter.printRecord(e.codigo());
+                csvPrinter.printRecord(e.codigoBarras());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -42,9 +42,10 @@ public class GerarCsvVenda {
         return csvPrinter;
     }
 
-    public String gerarArquivoCsv(Set<ProdutoDto> produtoDtos) throws IOException {
+    public String gerarArquivoCsv(String arquivoLocal ,Set<ProdutoNfDto> produtoNfDtos) throws IOException {
+        this.arquivoLocal = TMP_PATH + "/" + arquivoLocal;
         CSVPrinter csvPrinter = gerarCabecalho();
-        csvPrinter = gerarConteudo(csvPrinter, produtoDtos);
+        csvPrinter = gerarConteudo(csvPrinter, produtoNfDtos);
         csvPrinter.flush();
         return arquivoLocal;
     }

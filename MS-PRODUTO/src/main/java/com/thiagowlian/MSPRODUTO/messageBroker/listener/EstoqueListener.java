@@ -1,8 +1,10 @@
 package com.thiagowlian.MSPRODUTO.messageBroker.listener;
 
+import com.thiagowlian.MSPRODUTO.dto.ProdutoNfDto;
+import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueTransactionEventDto;
 import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueWithListProductsDto;
 import com.thiagowlian.MSPRODUTO.dto.VendaFeedbackDto;
-import com.thiagowlian.MSPRODUTO.messageBroker.producer.VendaFeedbackProducer;
+import com.thiagowlian.MSPRODUTO.messageBroker.producer.VendaSagaTransactionProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import com.thiagowlian.MSPRODUTO.service.ProdutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +22,25 @@ public class EstoqueListener {
 
     @Autowired
     private ProdutoService produtoService;
+
     @Autowired
-    private VendaFeedbackProducer producerVendaFeedback;
+    private VendaSagaTransactionProducer producerVendaFeedback;
 
     @RabbitListener(queues = VENDA_REALIZADA_PRODUTO_REDUZIR_ESTOQUE_QUEUE)
     public void onVendaCreated(ReducaoEstoqueWithListProductsDto reducaoEstoqueWithListProductsDto) {
         try {
             List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaCodigoBarra(reducaoEstoqueWithListProductsDto.produtosCodigoBarra());
-            if (!reducaoEstoqueWithListProductsDto.produtosCodigoBarra().isEmpty() && produtos.isEmpty()) {
-                producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId(), true));
+            if (produtoService.reducaoIsValid(reducaoEstoqueWithListProductsDto.produtosCodigoBarra(), produtos)) {
+                produtoService.reduzirEstoqueProdutoEmUm(produtos);
+                producerVendaFeedback.producerReducaoEstoque(createMensageReducao(reducaoEstoqueWithListProductsDto.vendaId(), produtos));
             }
-            produtoService.reduzirEstoqueProdutoEmUm(produtos);
         } catch (Exception ex) {
-            producerVendaFeedback.producerVendaFeedback(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId(), true));
+            producerVendaFeedback.producerVendaFeedbackError(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId()));
         }
+    }
+
+    public ReducaoEstoqueTransactionEventDto createMensageReducao(long vendaId, List<ProdutoModel> produtos) {
+        List<ProdutoNfDto> produtoNfDtos = produtos.stream().map(ProdutoNfDto::new).toList();
+        return new ReducaoEstoqueTransactionEventDto(vendaId, produtoNfDtos);
     }
 }
