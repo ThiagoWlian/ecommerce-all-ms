@@ -1,9 +1,6 @@
 package com.thiagowlian.MSPRODUTO.messageBroker.listener;
 
-import com.thiagowlian.MSPRODUTO.dto.ProdutoNfDto;
-import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueTransactionEventDto;
-import com.thiagowlian.MSPRODUTO.dto.ReducaoEstoqueWithListProductsDto;
-import com.thiagowlian.MSPRODUTO.dto.VendaFeedbackDto;
+import com.thiagowlian.MSPRODUTO.dto.*;
 import com.thiagowlian.MSPRODUTO.messageBroker.producer.VendaSagaTransactionProducer;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import com.thiagowlian.MSPRODUTO.service.ProdutoService;
@@ -32,10 +29,15 @@ public class EstoqueListener {
             List<ProdutoModel> produtos = produtoService.buscarProdutoPorListaCodigoBarra(reducaoEstoqueWithListProductsDto.produtosCodigoBarra());
             if (produtoService.reducaoIsValid(reducaoEstoqueWithListProductsDto.produtosCodigoBarra(), produtos)) {
                 produtoService.reduzirEstoqueProdutoEmUm(produtos);
-                producerVendaFeedback.producerReducaoEstoque(createMensageReducao(reducaoEstoqueWithListProductsDto.vendaId(), produtos));
+                producerVendaFeedback.producerReducaoEstoque(
+                        createMensageReducao(
+                                reducaoEstoqueWithListProductsDto.vendaId(),
+                                produtos));
             }
         } catch (Exception ex) {
-            producerVendaFeedback.producerVendaFeedbackError(new VendaFeedbackDto(reducaoEstoqueWithListProductsDto.vendaId()));
+            producerVendaFeedback.producerVendaFeedbackError(
+                    new VendaFeedbackErrorDto(reducaoEstoqueWithListProductsDto.vendaId(),
+                            reducaoEstoqueWithListProductsDto.produtosCodigoBarra()));
         }
     }
 

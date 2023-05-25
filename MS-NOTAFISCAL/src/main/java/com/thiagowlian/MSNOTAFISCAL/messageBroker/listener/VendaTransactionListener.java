@@ -31,10 +31,13 @@ public class VendaTransactionListener {
     public void onEstoqueListenerCreated(ReducaoEstoqueTransactionEventDto reducaoEstoqueTransactionEventDto) {
         try {
             gerarCsvVenda.gerarArquivoCsv(String.format("nfe_venda_%s.csv", reducaoEstoqueTransactionEventDto.vendaId()), new HashSet<>(reducaoEstoqueTransactionEventDto.produtoDtos()));
-            vendaTransactionProducer.producerVendaFeedbackSuccess(new VendaFeedbackSuccessDto(reducaoEstoqueTransactionEventDto.vendaId(), reducaoEstoqueTransactionEventDto.produtoDtos()));
+            vendaTransactionProducer.producerVendaFeedbackSuccess(new VendaFeedbackSuccessDto(reducaoEstoqueTransactionEventDto.vendaId()));
         } catch (IOException ex) {
             log.error(String.format("Erro na transação da venda %s. Erro: %s", reducaoEstoqueTransactionEventDto.vendaId(), ex.getMessage()));
-            vendaTransactionProducer.producerVendaFeedbackError(new VendaFeedbackErrorDto(reducaoEstoqueTransactionEventDto.vendaId()));
+            vendaTransactionProducer.producerVendaFeedbackError(
+                    new VendaFeedbackErrorDto(
+                            reducaoEstoqueTransactionEventDto.vendaId(),
+                            reducaoEstoqueTransactionEventDto.produtoDtos().stream().map(ProdutoNfDto::codigoBarras).toList()));
         }
     }
 }

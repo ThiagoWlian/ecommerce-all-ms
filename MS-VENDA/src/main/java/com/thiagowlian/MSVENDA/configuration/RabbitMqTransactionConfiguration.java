@@ -31,14 +31,14 @@ public class RabbitMqTransactionConfiguration {
     @Bean
     public Binding bindingVendaFeedbackError() {
         return BindingBuilder
-                .bind(new Queue(VENDA_FEEDBACK_QUEUE))
+                .bind(new Queue(VENDA_FEEDBACK_ERRO_QUEUE))
                 .to(new DirectExchange(VENDA_FEEDBACK_EXCHANGE)).with(VENDA_FEEDBACK_ERRO_ROUTING_KEY);
     }
 
     @Bean
     public Binding bindingVendaFeedbackSucess() {
         return BindingBuilder
-                .bind(new Queue(VENDA_FEEDBACK_QUEUE))
+                .bind(new Queue(VENDA_FEEDBACK_SUCESSO_QUEUE))
                 .to(new DirectExchange(VENDA_FEEDBACK_EXCHANGE)).with(VENDA_FEEDBACK_SUCESSO_ROUTING_KEY);
     }
 }

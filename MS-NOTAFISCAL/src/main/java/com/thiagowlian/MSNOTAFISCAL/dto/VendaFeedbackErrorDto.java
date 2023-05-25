@@ -1,4 +1,6 @@
 package com.thiagowlian.MSNOTAFISCAL.dto;
 
-public record VendaFeedbackErrorDto(Long vendaId) {
+import java.util.List;
+
+public record VendaFeedbackErrorDto(Long vendaId, List<String> produtos) {
 }
