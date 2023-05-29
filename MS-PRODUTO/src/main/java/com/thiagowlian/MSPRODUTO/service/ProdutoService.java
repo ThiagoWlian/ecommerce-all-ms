@@ -44,16 +44,16 @@ public class ProdutoService {
         List<EventModel> eventModels = produtoModels.stream()
                 .map(e -> new EventModel(EventType.REDUZIR_ESTOQUE, new modificacaoEstoqueDto(e.getCodigoBarras(), e.reduzirEstoqueEmUm())))
                 .toList();
-        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (modificacaoEstoqueDto)e.getContent()).toList());
         this.atualizarProdutos(eventModels);
+        produtoProducer.publishProdutosUpdateEvent(produtoModels);
     }
 
     public void aumentarEstoqueProdutoEmUm(List<ProdutoModel> produtoModels) {
         List<EventModel> eventModels = produtoModels.stream()
-                .map(e -> new EventModel(EventType.AUMENTAR_ESTOQUE, new modificacaoEstoqueDto(e.getCodigoBarras(), e.aumentarEstoqueEmUm())))
+                .map(e -> new EventModel(EventType.AUMENTAR_ESTOQUE, new modificacaoEstoqueDto(e.getCodigoBarras(), e.reduzirEstoqueEmUm())))
                 .toList();
-        produtoProducer.publishProdutosReducaoEstoqueEvent(eventModels.stream().map(e -> (modificacaoEstoqueDto)e.getContent()).toList());
         this.atualizarProdutos(eventModels);
+        produtoProducer.publishProdutosUpdateEvent(produtoModels);
     }
 
     public void reverterReducaoEstoque(List<String> ids) {
@@ -82,7 +82,15 @@ public class ProdutoService {
         }
     }
 
+    public void atualizarProduto(ProdutoModel produtoModel) {
+        try {
+            produtoRepository.update(produtoModel);
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
     public boolean reducaoIsValid(List<String> codigosBarraReducao, List<ProdutoModel> produtoFind) {
-        return codigosBarraReducao.size() != produtoFind.size();
+        return codigosBarraReducao.size() == produtoFind.size() && !produtoFind.isEmpty();
     }
 }

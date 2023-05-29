@@ -15,10 +15,10 @@ public record VendaForm(@NotEmpty List<ProdutoForm> produtos, @PositiveOrZero Do
                 .collect(Collectors.toList());
     }
 
-    public List<Long> getListProdutoId() {
+    public List<String> getListProdutoId() {
         return produtos()
                 .stream()
-                .map(ProdutoForm::id)
+                .map(ProdutoForm::codigoBarra)
                 .collect(Collectors.toList());
     }
 }

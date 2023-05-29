@@ -24,7 +24,7 @@ public class VendaService {
     @Transactional
     public VendaModel cadastrarVenda(VendaModel vendaModel) {
         VendaModel venda = vendaRepository.save(vendaModel);
-        vendaMessageProducer.producerVendaRealizada(new ReducaoEstoqueDto(venda.getId(), venda.getProdutosId()));
+        vendaMessageProducer.producerVendaRealizada(new ReducaoEstoqueDto(venda.getId(), venda.getCodigosBarra()));
         return venda;
     }
 
@@ -32,6 +32,7 @@ public class VendaService {
         Optional<VendaModel> venda = vendaRepository.findById(vendaId);
         if (venda.isPresent()) {
             venda.get().setStatusVenda(statusVenda);
+            vendaRepository.save(venda.get());
         }
     }
 

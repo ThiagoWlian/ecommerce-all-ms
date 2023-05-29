@@ -1,6 +1,5 @@
 package com.thiagowlian.MSPRODUTO.messageBroker.producer;
 
-import com.thiagowlian.MSPRODUTO.dto.modificacaoEstoqueDto;
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,15 +17,11 @@ public class ProdutoProducer {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void publishProdutosReducaoEstoqueEvent(List<modificacaoEstoqueDto> produtos) {
-        produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_UPDATE_EXCHANGE, NULL_ROUNTING_KEY, e));
-    }
-
     public void publishProdutoCreatedEvent(ProdutoModel produto) {
         rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, produto);
     }
 
     public void publishProdutosUpdateEvent(List<ProdutoModel> produtos) {
-        produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_NOVO_EXCHANGE, NULL_ROUNTING_KEY, e));
+        produtos.stream().forEach(e -> rabbitTemplate.convertAndSend(PRODUDO_UPDATE_EXCHANGE, NULL_ROUNTING_KEY, e));
     }
 }

@@ -17,6 +17,11 @@ public class RabbitMQTransactionConfiguration {
     }
 
     @Bean
+    public DirectExchange exchangeProdutoReducaoEstoque() {
+        return new DirectExchange(VENDA_REALIZADA_PRODUDO_REDUCAO_ESTOQUE_ROUTING_KEY);
+    }
+
+    @Bean
     public Binding bindingReducaoEstoque(){
         return BindingBuilder
                 .bind(new Queue(REALIZAR_VENDA_REDUCAO_ESTOQUE_TRANSACTION))

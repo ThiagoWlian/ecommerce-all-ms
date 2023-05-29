@@ -1,13 +1,9 @@
 package com.thiagowlian.MSVENDA.controller;
 
-import com.thiagowlian.MSVENDA.dto.ReducaoEstoqueDto;
 import com.thiagowlian.MSVENDA.dto.ResponseMessageDto;
 import com.thiagowlian.MSVENDA.dto.VendaForm;
-import com.thiagowlian.MSVENDA.messageBroker.producer.VendaMessageProducer;
 import com.thiagowlian.MSVENDA.model.VendaModel;
-import com.thiagowlian.MSVENDA.repository.VendaRepository;
 import com.thiagowlian.MSVENDA.service.VendaService;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +26,8 @@ public class VendaController {
     public ResponseEntity realizarVenda(@RequestBody VendaForm vendaForm) {
         try {
             List<Double> valorProdutos = vendaForm.getListDesconto();
-            List<Long> produtosId = vendaForm.getListProdutoId();
-            VendaModel venda = vendaService.cadastrarVenda(new VendaModel(produtosId, vendaForm.desconto(), valorProdutos));
+            List<String> codigosBarra = vendaForm.getListProdutoId();
+            VendaModel venda = vendaService.cadastrarVenda(new VendaModel(codigosBarra, vendaForm.desconto(), valorProdutos));
             return ResponseEntity.created(URI.create("/venda/" + venda.getId())).build();
         } catch (AmqpException ampqEx) {
             log.error("Ocorreu um erro na criação do evento na fila: " + ampqEx.getMessage());

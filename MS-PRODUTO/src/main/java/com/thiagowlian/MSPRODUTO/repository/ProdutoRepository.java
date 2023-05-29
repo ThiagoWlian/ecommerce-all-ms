@@ -1,11 +1,11 @@
 package com.thiagowlian.MSPRODUTO.repository;
 
 import com.thiagowlian.MSPRODUTO.model.ProdutoModel;
+import com.thiagowlian.MSPRODUTO.model.ProdutoTipo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
@@ -34,14 +34,28 @@ public class ProdutoRepository {
         simpleJdbcInsert.execute(parameters);
     }
 
+    public void update(ProdutoModel produtoModel) {
+        jdbcTemplate.update("UPDATE PRODUTO SET nome = ?, tipo = ?, valor = ?, estoque = ? WHERE codigo_barra = ?",
+                produtoModel.getNome(),
+                produtoModel.getProdutoTipo().toString(),
+                produtoModel.getValor(),
+                produtoModel.getEstoque(),
+                produtoModel.getCodigoBarras()
+        );
+    }
+
     public List<ProdutoModel> findAll(){
         return jdbcTemplate.query("SELECT * FROM PRODUTO", new BeanPropertyRowMapper(ProdutoModel.class));
     }
 
     public List<ProdutoModel> findAllByCodigosBarra(List<String> codigosBarra){
-        return jdbcTemplate.query("SELECT * FROM PRODUTO WHERE codigo_barra IN (?)", (rs, rowNum) -> {
+        return jdbcTemplate.query("SELECT codigo_barra, nome, tipo, valor, estoque FROM PRODUTO WHERE codigo_barra IN (?)", (rs, rowNum) -> {
                     ProdutoModel produtoModel = new ProdutoModel();
                     produtoModel.setCodigoBarras(rs.getString("codigo_barra"));
+                    produtoModel.setNome(rs.getString("nome"));
+                    produtoModel.setProdutoTipo(ProdutoTipo.valueOf(rs.getString("tipo")));
+                    produtoModel.setValor(rs.getDouble("valor"));
+                    produtoModel.setEstoque(rs.getLong("estoque"));
                     return produtoModel;
                 },
                 codigosBarra.toArray());

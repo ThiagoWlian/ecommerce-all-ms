@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import static com.thiagowlian.MSNOTAFISCAL.messageBroker.FilasMensageria.REALIZAR_VENDA_REDUCAO_ESTOQUE_TRANSACTION;
 
@@ -32,12 +29,13 @@ public class VendaTransactionListener {
         try {
             gerarCsvVenda.gerarArquivoCsv(String.format("nfe_venda_%s.csv", reducaoEstoqueTransactionEventDto.vendaId()), new HashSet<>(reducaoEstoqueTransactionEventDto.produtoDtos()));
             vendaTransactionProducer.producerVendaFeedbackSuccess(new VendaFeedbackSuccessDto(reducaoEstoqueTransactionEventDto.vendaId()));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.error(String.format("Erro na transação da venda %s. Erro: %s", reducaoEstoqueTransactionEventDto.vendaId(), ex.getMessage()));
             vendaTransactionProducer.producerVendaFeedbackError(
                     new VendaFeedbackErrorDto(
                             reducaoEstoqueTransactionEventDto.vendaId(),
-                            reducaoEstoqueTransactionEventDto.produtoDtos().stream().map(ProdutoNfDto::codigoBarras).toList()));
+                            reducaoEstoqueTransactionEventDto.produtoDtos().stream().map(ProdutoNfDto::codigoBarras)
+                                    .toList()));
         }
     }
 }

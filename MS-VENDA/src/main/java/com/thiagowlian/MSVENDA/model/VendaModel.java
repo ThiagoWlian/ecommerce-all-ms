@@ -19,7 +19,7 @@ public class VendaModel extends BaseModel{
     @ElementCollection
     @Column(name = "idProduto")
     @CollectionTable(name = "produto", joinColumns = @JoinColumn(name = "produto_id"))
-    private List<Long> produtosId;
+    private List<String> codigosBarra;
 
     @Setter
     @Column(name = "desconto")
@@ -40,8 +40,8 @@ public class VendaModel extends BaseModel{
     @Column(name = "status", nullable = false)
     private StatusVenda statusVenda;
 
-    public VendaModel (List<Long> produtosId, double desconto, List<Double> valoresProdutos) {
-        this.produtosId = produtosId;
+    public VendaModel (List<String> codigosBarra, double desconto, List<Double> valoresProdutos) {
+        this.codigosBarra = codigosBarra;
         this.desconto = desconto;
         calcularTotalVenda(valoresProdutos);
         calcularTotalFinalVenda();

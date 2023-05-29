@@ -34,6 +34,9 @@ public class GerarCsvVenda {
         produtos.forEach(e -> {
             try {
                 csvPrinter.printRecord(e.codigoBarras());
+                csvPrinter.printRecord(e.nome());
+                csvPrinter.printRecord(e.estoque());
+                csvPrinter.printRecord(e.valor());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

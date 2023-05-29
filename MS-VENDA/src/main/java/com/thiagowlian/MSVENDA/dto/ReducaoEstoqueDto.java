@@ -4,6 +4,6 @@ import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
-public record ReducaoEstoqueDto(@Positive long vendaId, @Positive List<Long> produtosId){
+public record ReducaoEstoqueDto(@Positive long vendaId, @Positive List<String> produtosCodigoBarra){
 
 }

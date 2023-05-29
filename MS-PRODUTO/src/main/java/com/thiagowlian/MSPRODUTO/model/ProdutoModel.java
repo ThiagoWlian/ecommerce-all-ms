@@ -1,10 +1,7 @@
 package com.thiagowlian.MSPRODUTO.model;
 
 import com.thiagowlian.MSPRODUTO.dto.ProdutoForm;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -25,6 +22,14 @@ public class ProdutoModel extends BaseModel{
         this.valor = produtoForm.valor();
         this.codigoBarras = produtoForm.codigoBarra();
         this.estoque = produtoForm.estoque();
+    }
+
+    public ProdutoModel (String codigoBarras, String nome, String produtoTipo, Double valor, Long estoque) {
+        this.codigoBarras = codigoBarras;
+        this.nome = nome;
+        this.produtoTipo = ProdutoTipo.valueOf(produtoTipo);
+        this.valor = valor;
+        this.estoque = estoque;
     }
 
     public void reduzirEstoque(long quantidadeReducao) {

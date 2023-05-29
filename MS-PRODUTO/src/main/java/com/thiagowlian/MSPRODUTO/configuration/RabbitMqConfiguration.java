@@ -24,7 +24,17 @@ public class RabbitMqConfiguration {
 
     @Bean
     public Queue queueUpdateProdutoQueryTable() {
-        return new Queue(PRODUDO_UPDATE_EXCHANGE);
+        return new Queue(PRODUTO_UPDATE_QUERY_TABLE_QUEUE);
+    }
+
+    @Bean
+    public FanoutExchange fanoutExchangeNovoProdutoQueryTable() {
+        return new FanoutExchange(PRODUDO_NOVO_EXCHANGE);
+    }
+
+    @Bean
+    public FanoutExchange fanoutExchangeUpdateProdutoQueryTable() {
+        return new FanoutExchange(PRODUDO_UPDATE_EXCHANGE);
     }
 
     @Bean
@@ -32,6 +42,13 @@ public class RabbitMqConfiguration {
         return BindingBuilder
                 .bind(new Queue(PRODUTO_UPDATE_QUERY_TABLE_QUEUE))
                 .to(new FanoutExchange(PRODUDO_UPDATE_EXCHANGE));
+    }
+
+    @Bean
+    public Binding bindingProdutoNovo() {
+        return BindingBuilder
+                .bind(new Queue(PRODUTO_NOVO_QUERY_TABLE_QUEUE))
+                .to(new FanoutExchange(PRODUDO_NOVO_EXCHANGE));
     }
 
     @Bean
