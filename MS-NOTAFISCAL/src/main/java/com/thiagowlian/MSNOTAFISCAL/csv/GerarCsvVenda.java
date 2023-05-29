@@ -18,12 +18,11 @@ import org.springframework.stereotype.Component;
 public class GerarCsvVenda {
 
     private String arquivoLocal;
-    private final String TMP_PATH = "./tmp";
+    private final String TMP_PATH = ".";
 
     private CSVPrinter gerarCabecalho() {
         try {
             BufferedWriter writer = Files.newBufferedWriter(Paths.get(arquivoLocal));
-
             return new CSVPrinter(writer, CSVFormat.DEFAULT
                     .withHeader("Código", "Nome", "Quantidade", "Valor Unitário", "Valor Total"));
         } catch (IOException e) {
